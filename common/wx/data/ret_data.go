@@ -66,3 +66,12 @@ type WeChatQueryResult struct {
 	TradeState     string `xml:"trade_state"`
 	TradeStateDesc string `xml:"trade_state_desc"`
 }
+
+type ResCharge struct {
+	AppID     string
+	TimeStamp string
+	NonceStr  string
+	Package   string
+	SignType  string
+	Sign      string
+}

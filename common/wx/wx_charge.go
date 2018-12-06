@@ -5,7 +5,9 @@ import (
 	"encoding/xml"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/openpeng/fool-pay/errors"
 
@@ -75,5 +77,22 @@ func (pc *ChargeClient) Send() interface{} {
 	if xmlRe.ReturnCode != "SUCCESS" {
 		errors.ThrewMessageError(xmlRe.ReturnMsg)
 	}
-	return xmlRe
+	var resPar = data.ResCharge{
+		AppID:     xmlRe.AppID,
+		TimeStamp: strconv.FormatInt(time.Now().Unix(), 10),
+		NonceStr:  xmlRe.NonceStr,
+		Package:   "prepay_id=" + xmlRe.PrepayID,
+		SignType:  "MD5",
+		Sign:      "",
+	}
+	var allParams = map[string]string{
+		"appId":     resPar.AppID,
+		"timeStamp": resPar.TimeStamp,
+		"nonceStr":  resPar.NonceStr,
+		"package":   resPar.Package,
+		"signType":  resPar.SignType,
+	}
+	resPar.Sign, _ = pc.GetSign(allParams)
+	// 转出xml结构
+	return resPar
 }
