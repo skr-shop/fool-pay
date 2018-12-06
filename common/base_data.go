@@ -3,6 +3,7 @@ package common
 type BaseDataInterface interface {
 	CheckDataParam()
 	BuildReqData(reqd ReqData)
+	SignStr(reqd ReqData)
 }
 
 type ReqData struct {
@@ -10,11 +11,11 @@ type ReqData struct {
 	Subject        string `json:"subject"`
 	Openid         string `json:"openid"`
 	OrderNo        string `json:"order_no"`
-	TimeoutExpress string `json:"timeout_express"`
+	TimeoutExpress int64  `json:"timeout_express"`
 	Amount         string `json:"amount"`
 	ReturnParam    string `json:"return_param"`
 	// 支付宝公有
-	GoodsType string `json:"goods_type"`
+	GoodsType int8   `json:"goods_type"`
 	StoreId   string `json:"store_id"`
 
 	// 条码支付
@@ -45,6 +46,11 @@ func (b *BaseData) CheckDataParam() {
 }
 
 func (b *BaseData) BuildReqData(reqd ReqData) {
+	b.ReqData = reqd
+	b.CheckDataParam()
+}
+
+func (b *BaseData) SignStr(reqd ReqData) {
 	b.ReqData = reqd
 	b.CheckDataParam()
 }

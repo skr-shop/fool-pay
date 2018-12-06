@@ -1,5 +1,10 @@
 package notify
 
+type NotifyProcessData struct {
+	GetNotifyData
+}
+
 type Notify interface {
-	getNotifyData()
+	GetNotifyData()
+	NotifyProcess(data NotifyProcessData)
 }

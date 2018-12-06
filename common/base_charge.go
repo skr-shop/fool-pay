@@ -1,40 +1,20 @@
 package common
 
-import (
-	"fmt"
-)
-
 type ChargeClientInterface interface {
 	Send() interface{}
-	SetSign() interface{}
+	BuildData() interface{}
+	Charge(data ReqData) interface{}
+	GetSign(m map[string]string) (string, error)
 }
 
 type ChargeClient struct {
 	ConfigData BaseConfig
+	ReqData    ReqData
 	ChargeClientInterface
 }
 
-func NewChargeClient(intface ChargeClientInterface) ChargeClient {
-	return ChargeClient{
+func NewChargeClient(intface ChargeClientInterface) *ChargeClient {
+	return &ChargeClient{
 		ChargeClientInterface: intface,
 	}
-}
-
-type PubChargeClient struct {
-	This       PubChargeClientImpl
-	ConfigData BaseConfig
-	PubChargeClientImpl
-}
-
-type PubChargeClientImpl interface {
-	ChargeClientInterface
-}
-
-func (pc PubChargeClient) Send() interface{} {
-	fmt.Println(pc.This.SetSign())
-	return "公共的发送"
-}
-
-func (pc PubChargeClient) SetSign() interface{} {
-	return "签名有没有?"
 }

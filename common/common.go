@@ -1,7 +1,5 @@
 package common
 
-import ()
-
 // PayClient 支付客户端接口
 type PayClient interface {
 	Pay(charge *Charge) (string, error)

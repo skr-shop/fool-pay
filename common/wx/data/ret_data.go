@@ -1,4 +1,4 @@
-package common
+package data
 
 // WeChatResult 微信支付返回
 type WeChatReResult struct {

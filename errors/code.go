@@ -34,3 +34,15 @@ func ThrewMessageError(message string) {
 func IsOK() PayError {
 	return PayError{ErrorCode: HANDLE_OK, Message: ErrorMessage[HANDLE_OK]}
 }
+
+// Catch ...
+func Catch(e *PayError) {
+	if err := recover(); err != nil {
+		switch err.(type) {
+		case PayError:
+			pe := err.(PayError)
+			e.ErrorCode = pe.ErrorCode
+			e.Message = pe.Message
+		}
+	}
+}
