@@ -1,10 +1,7 @@
 package common
 
 type ChargeClientInterface interface {
-	Send() interface{}
-	BuildData() interface{}
 	Charge(data ReqData) interface{}
-	GetSign(m map[string]string) (string, error)
 }
 
 type ChargeClient struct {
@@ -13,8 +10,9 @@ type ChargeClient struct {
 	ChargeClientInterface
 }
 
-func NewChargeClient(intface ChargeClientInterface) *ChargeClient {
+func NewChargeClient(configData BaseConfig, intface ChargeClientInterface) *ChargeClient {
 	return &ChargeClient{
+		ConfigData:            configData,
 		ChargeClientInterface: intface,
 	}
 }

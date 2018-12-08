@@ -1,5 +1,7 @@
 package errors
 
+import "fmt"
+
 type ErrorCode int
 
 const (
@@ -7,12 +9,16 @@ const (
 	PAY_MODULE ErrorCode = 10001 + iota
 	PAY_PUB_WRONG
 	NO_SUPPORT_CHANNEL
+	SIGN_WRONG
+	PAY_CONFIG_NO_KEY
 )
 
 var ErrorMessage = map[ErrorCode]string{
 	HANDLE_OK:          "处理成功",
 	PAY_MODULE:         "支付内部错误",
 	NO_SUPPORT_CHANNEL: "不支持的支付类型",
+	SIGN_WRONG:         "签名错误",
+	PAY_CONFIG_NO_KEY:  "缺少加密的key",
 }
 
 type PayError struct {
@@ -43,6 +49,8 @@ func Catch(e *PayError) {
 			pe := err.(PayError)
 			e.ErrorCode = pe.ErrorCode
 			e.Message = pe.Message
+			return
 		}
+		fmt.Println(err)
 	}
 }

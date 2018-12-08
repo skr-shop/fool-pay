@@ -1,92 +1,106 @@
 package util
 
 import (
-	"crypto/tls"
-	"io/ioutil"
+	"fmt"
 	"net/http"
-	"strings"
 	"time"
+
+	"github.com/imroc/req"
 )
 
-var (
-	tokenServer       string
-	tokenUsername     string
-	tokenPassword     string
-	payClientCertFile string
-	payClientKeyFile  string
-	payClientRootCert string
-
-	HTTPC  *HTTPClient
-	HTTPSC *HTTPSClient
-)
-
-func init() {
-	HTTPC = &HTTPClient{}
-	HTTPSC = NewHTTPSClient()
+type HttpClient struct {
+	Debug       bool
+	HttpRequest *http.Request
 }
 
-// HTTPSClient HTTPS客户端结构
-type HTTPSClient struct {
-	http.Client
+func InitHttpClient() *HttpClient {
+	var httpClient = new(HttpClient)
+	httpClient.HttpRequest = new(http.Request)
+	req.SetTimeout(5 * time.Second)
+	return httpClient
 }
 
-// GetDefaultClient 返回默认的客户端
-func GetDefaultClient() *HTTPSClient {
-	return HTTPSC
-}
-
-// NewHTTPSClient 新建https客户端
-// func NewHTTPSClient(certFile string, keyFile string) *HTTPSClient {
-// 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-// 	if err != nil {
-// 		log.Error("load x509 cert error:", err)
-// 		return nil
-// 	}
-// 	config := &tls.Config{
-// 		Certificates: []tls.Certificate{cert},
-// 	}
-// 	config.BuildNameToCertificate()
-// 	tr := &http.Transport{TLSClientConfig: config}
-// 	client := &http.Client{Transport: tr}
-// 	return &HTTPSClient{
-// 		Client: *client,
-// 	}
-// }
-
-// NewHTTPSClient 获取默认https客户端
-func NewHTTPSClient() *HTTPSClient {
-	config := &tls.Config{InsecureSkipVerify: true}
-	tr := &http.Transport{TLSClientConfig: config}
-	client := http.Client{
-		Transport: tr,
-		Timeout:   15 * time.Second,
+func (hc *HttpClient) handle(paramData map[string]interface{}, headerParam map[string]string) (req.Param, req.Header) {
+	header := req.Header{
+		"Content-Type": "application/x-www-form-urlencoded",
 	}
-	return &HTTPSClient{
-		Client: client,
+	if headerParam != nil {
+		for k, v := range headerParam {
+			header[k] = v
+		}
 	}
+	if hc.Debug {
+		req.Debug = true
+	}
+	param := req.Param(paramData)
+	return param, headerParam
 }
 
-// PostData 提交post数据
-func (c *HTTPSClient) PostData(url string, contentType string, data string) ([]byte, error) {
-	resp, err := c.Post(url, contentType, strings.NewReader(data))
+func (hc *HttpClient) Post(url string, paramData map[string]interface{}, headerParam map[string]string) (interface{}, error) {
+	param, header := hc.handle(paramData, headerParam)
+	r, err := req.Post(url, param, header)
+	var data interface{}
 	if err != nil {
-		return nil, err
+		fmt.Println("http:request:"+url+"===error", err)
+	} else {
+		r.ToJSON(&data)
 	}
-	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	return data, err
 }
 
-// HTTPClient http客户端
-type HTTPClient struct {
-	http.Client
-}
-
-// PostData post数据
-func (c *HTTPClient) PostData(url, format string, data string) ([]byte, error) {
-	resp, err := c.Post(url, format, strings.NewReader(data))
+func (hc *HttpClient) Put(url string, paramData map[string]interface{}, headerParam map[string]string) (interface{}, error) {
+	param, header := hc.handle(paramData, headerParam)
+	r, err := req.Put(url, param, header)
+	var data interface{}
 	if err != nil {
-		return nil, err
+		fmt.Println("http:request:"+url+"===error", err)
+	} else {
+		r.ToJSON(&data)
 	}
-	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	return data, err
+}
+
+func (hc *HttpClient) Delete(url string, paramData map[string]interface{}, headerParam map[string]string) ([]byte, error) {
+	param, header := hc.handle(paramData, headerParam)
+	r, _ := req.Delete(url, param, header)
+	return r.ToBytes()
+}
+
+func (hc *HttpClient) Get(url string, paramData map[string]interface{}, headerParam map[string]string) (interface{}, error) {
+	param, header := hc.handle(paramData, headerParam)
+	r, err := req.Get(url, param, header)
+	var data interface{}
+	if err != nil {
+		fmt.Println("http:request:"+url+"===error", err)
+	} else {
+		r.ToJSON(&data)
+	}
+	return data, err
+}
+
+func (hc *HttpClient) PostBodyJson(url string, body interface{}) (interface{}, error) {
+	var data interface{}
+	r, err := req.Post(url, req.BodyJSON(&body))
+	if err != nil {
+		fmt.Println("http:request:"+url+"===error", err)
+	} else {
+		r.ToJSON(&data)
+	}
+	return data, err
+}
+
+func (hc *HttpClient) PostBodyJsonWithHeader(url string, body interface{}) (interface{}, error) {
+	r, err := req.Post(url, req.BodyJSON(&body), req.Header{"origin": "tiku.gaodun.coms"})
+	var data interface{}
+	if err != nil {
+		fmt.Println("http:request:"+url+"===error", err)
+	} else {
+		r.ToJSON(&data)
+	}
+	return data, err
+}
+
+func (hc *HttpClient) PostBodyXml(url string, body interface{}) ([]byte, error) {
+	r, err := req.Post(url, body)
+	return r.Bytes(), err
 }

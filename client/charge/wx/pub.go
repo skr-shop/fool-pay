@@ -8,24 +8,21 @@ import (
 	"time"
 
 	"github.com/openpeng/fool-pay/common"
-	"github.com/openpeng/fool-pay/common/wx"
 	"github.com/openpeng/fool-pay/common/wx/data"
 )
 
 type WxPubCharge struct {
-	ChargeClient *common.ChargeClient
+	*ChargeClient
 }
 
-func NewWxPubCharge(config common.BaseConfig) *common.ChargeClient {
+func NewWxPubCharge(configData common.BaseConfig) *WxPubCharge {
 	temp := &WxPubCharge{}
-	wxc := wx.NewChargeClient(temp)
-	wxc.ConfigData = config
-	temp.ChargeClient = wxc
-	return wxc
+	temp.ChargeClient = NewChargeClient(configData, temp)
+	return temp
 }
 
 func (wpc *WxPubCharge) BuildData() string {
-	wccc := wpc.ChargeClient.ConfigData.ConfigWxData
+	wccc := wpc.ChargeClient.ChargeClient.ConfigData.ConfigWxData
 	wcr := wpc.ChargeClient.ReqData
 	var cpd = data.ChargePub{
 		Appid:          wccc.AppId,
