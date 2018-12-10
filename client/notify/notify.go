@@ -16,21 +16,6 @@ var supportChannel = []constant.PayOperation{
 func Run(channel constant.PayOperation, config common.BaseConfig, data []byte, userNotify notify.NotifyInterface) (retdata interface{}, iswrong errors.PayError) {
 	iswrong = errors.PayError{}
 	defer errors.Catch(&iswrong)
-	// 异常捕获的两种写法
-	// 第一种
-	// iswrong = errors.PayError{} //主要作用是分配内存
-	// defer errors.Catch(&iswrong) //正常捕获
-	// 第二种
-	// defer func() {
-	// 	if err := recover(); err != nil {
-	// 		switch err.(type) {
-	// 		case errors.PayError:
-	// 			pe := err.(errors.PayError)
-	// 			iswrong.ErrorCode = pe.ErrorCode
-	// 			iswrong.Message = pe.Message
-	// 		}
-	// 	}
-	// }()
 	support := false
 	for _, supportChannel := range supportChannel {
 		if channel == supportChannel {
@@ -46,15 +31,14 @@ func Run(channel constant.PayOperation, config common.BaseConfig, data []byte, u
 }
 
 //数据绑定
-func getHandle(channel constant.PayOperation, config common.BaseConfig) *common.NotifyClient {
-	var handle common.NotifyClient
+func getHandle(channel constant.PayOperation, config common.BaseConfig) common.NotifyClientInterface {
+	var handle interface{}
 	switch channel {
 	case constant.WX_CHARGE:
-		ser := wxnotify.NewWechatNotify(config)
-		handle = *common.NewNotifyClient(ser)
+		handle = wxnotify.NewWechatNotify(config)
 		break
 	default:
 		errors.ThrewError(errors.NO_SUPPORT_CHANNEL)
 	}
-	return &handle
+	return handle.(common.NotifyClientInterface)
 }

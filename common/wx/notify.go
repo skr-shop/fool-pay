@@ -21,15 +21,15 @@ type NotifyClientInterface interface {
 
 type NotifyClient struct {
 	*common.NotifyClient
-	This NotifyClientInterface
+	NotifyClientInterface
 }
 
-func NewNotifyClient(intface ClientInterface) *common.NotifyClient {
+func NewNotifyClient(config common.BaseConfig, intface NotifyClientInterface) *NotifyClient {
 	var cc = &NotifyClient{
-		This: intface,
+		NotifyClientInterface: intface,
 	}
-	cc.NotifyClient = common.NewNotifyClient(cc)
-	return cc.NotifyClient
+	cc.NotifyClient = common.NewNotifyClient(config, cc)
+	return cc
 }
 
 func (nc *NotifyClient) Notify(d []byte, process notify.NotifyInterface) bool {
@@ -85,4 +85,11 @@ func (nc *NotifyClient) GetSign(m map[string]string) (string, error) {
 		return "", err
 	}
 	return strings.ToUpper(fmt.Sprintf("%x", signByte)), nil
+}
+
+//检测配置
+func (pc *NotifyClient) CheckConfig() {
+	if pc.ConfigData.ConfigWxData.Md5Key == "" {
+		errors.ThrewError(errors.PAY_CONFIG_NO_KEY)
+	}
 }

@@ -12,8 +12,9 @@ type NotifyClient struct {
 	NotifyClientInterface
 }
 
-func NewNotifyClient(intface NotifyClientInterface) *NotifyClient {
+func NewNotifyClient(configData BaseConfig, intface NotifyClientInterface) *NotifyClient {
 	return &NotifyClient{
+		ConfigData:            configData,
 		NotifyClientInterface: intface,
 	}
 }
