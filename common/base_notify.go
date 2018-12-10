@@ -3,7 +3,7 @@ package common
 import "github.com/openpeng/fool-pay/notify"
 
 type NotifyClientInterface interface {
-	Notify(d []byte, process notify.NotifyInterface) bool
+	Notify(d []byte, process notify.NotifyInterface) string
 }
 
 type NotifyClient struct {

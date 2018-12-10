@@ -13,7 +13,7 @@ var supportChannel = []constant.PayOperation{
 	// constant.ALI_CHARGE
 }
 
-func Run(channel constant.PayOperation, config common.BaseConfig, data []byte, userNotify notify.NotifyInterface) (retdata interface{}, iswrong errors.PayError) {
+func Run(channel constant.PayOperation, config common.BaseConfig, data []byte, userNotify notify.NotifyInterface) (retdata bool, iswrong errors.PayError) {
 	iswrong = errors.PayError{}
 	defer errors.Catch(&iswrong)
 	support := false

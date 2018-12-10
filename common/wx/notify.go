@@ -32,8 +32,12 @@ func NewNotifyClient(config common.BaseConfig, intface NotifyClientInterface) *N
 	return cc
 }
 
-func (nc *NotifyClient) Notify(d []byte, process notify.NotifyInterface) bool {
-	return process.NotifyProcess(nc.GetNotifyData(d))
+func (nc *NotifyClient) Notify(d []byte, process notify.NotifyInterface) string {
+	ok := process.NotifyProcess(nc.GetNotifyData(d))
+	if ok {
+		return "ok"
+	}
+	return "false"
 }
 
 func (nc *NotifyClient) GetNotifyData(b []byte) notify.NotifyProcessData {
