@@ -10,6 +10,7 @@ type PayChannel string
 type PayOperation string
 type PayStatus string
 type PayServer string
+type AliPayMethod string
 
 const (
 	PAY_SERVER_ALI PayServer = "ali"
@@ -71,4 +72,35 @@ const (
 	PAY_MAX_FEE = "100000000.00" // 支付的最大金额
 
 	TRANS_FEE = "50000" // 转账达到这个金额，需要添加额外信息
+
+	//========================= 支付宝各类method名称 =======================//
+	// wap 支付
+	WAP_PAY_METHOD AliPayMethod = "alipay.trade.wap.pay"
+
+	// app 支付
+	APP_PAY_METHOD AliPayMethod = "alipay.trade.app.pay"
+
+	// 即时到账 web支付
+	PC_PAY_METHOD AliPayMethod = "create_direct_pay_by_user"
+
+	// 扫码支付   用户扫商户的二维码
+	QR_PAY_METHOD AliPayMethod = "alipay.trade.precreate"
+
+	// 条码支付   商户扫用户的二维码
+	BAR_PAY_METHOD AliPayMethod = "alipay.trade.pay"
+
+	// 统一收单线下交易查询
+	TRADE_QUERY_METHOD AliPayMethod = "alipay.trade.query"
+
+	// 统一收单交易退款查询  未完成
+	REFUND_QUERY_METHOD AliPayMethod = "alipay.trade.fastpay.refund.query"
+
+	// 转账情况查询
+	TRANS_QUERY_METHOD AliPayMethod = "alipay.fund.trans.order.query"
+
+	// 统一收单交易退款接口
+	TRADE_REFUND_METHOD AliPayMethod = "alipay.trade.refund"
+
+	// 单笔转账到支付宝账户接口
+	TRANS_TOACCOUNT_METHOD AliPayMethod = "alipay.fund.trans.toaccount.transfer"
 )

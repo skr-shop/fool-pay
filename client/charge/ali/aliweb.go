@@ -1,4 +1,4 @@
-package client
+package ali
 
 import (
 	"bytes"
@@ -8,11 +8,12 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
-	"github.com/lxp521125/fool-pay/common"
 	"log"
 	"net/url"
 	"sort"
 	"strings"
+
+	"github.com/lxp521125/fool-pay/common"
 )
 
 var aliWebClient *AliWebClient

@@ -1,6 +1,7 @@
 package charge
 
 import (
+	aliCharge "github.com/openpeng/fool-pay/client/charge/ali"
 	wxCharge "github.com/openpeng/fool-pay/client/charge/wx"
 	"github.com/openpeng/fool-pay/common"
 	"github.com/openpeng/fool-pay/constant"
@@ -12,6 +13,7 @@ var supportChannel = []constant.PayChannel{
 	constant.WX_CHANNEL_APP,
 	constant.WX_CHANNEL_LITE,
 	constant.WX_CHANNEL_QR,
+	constant.ALI_CHANNEL_WAP,
 }
 
 func Run(channel constant.PayChannel, config common.BaseConfig, data common.ReqData) (retdata interface{}, iswrong errors.PayError) {
@@ -39,6 +41,12 @@ func getHandle(channel constant.PayChannel, config common.BaseConfig) common.Cha
 		fallthrough
 	case constant.WX_CHANNEL_LITE:
 		handle = wxCharge.NewWxPubCharge(config)
+		break
+	case constant.WX_CHANNEL_APP:
+		handle = wxCharge.NewWxAppCharge(config)
+		break
+	case constant.ALI_CHANNEL_WAP:
+		handle = aliCharge.NewAliWapCharge(config)
 		break
 	// case Config::WX_CHANNEL_WAP:
 	//     $this->channel = new WxWapCharge($config);

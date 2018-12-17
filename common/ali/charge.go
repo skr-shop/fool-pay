@@ -1,20 +1,25 @@
-package wx
+package common
 
 import (
-	"crypto/md5"
-	"encoding/xml"
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
+	"log"
+	"net/url"
 	"sort"
-	"strconv"
 	"strings"
-	"time"
+
+	"github.com/openpeng/fool-pay/util"
 
 	"github.com/openpeng/fool-pay/container"
 
 	"github.com/openpeng/fool-pay/errors"
 
 	"github.com/openpeng/fool-pay/common"
-	"github.com/openpeng/fool-pay/common/wx/data"
+	"github.com/openpeng/fool-pay/common/ali/data"
 )
 
 type ClientInterface interface {
@@ -31,13 +36,19 @@ type ChargeClient struct {
 	*common.ChargeClient
 	*common.HttpClient
 	ClientInterface
-	*data.WeChatReResult
+	*data.AliResResult
+	PrivateKey *rsa.PrivateKey
+	PublicKey  *rsa.PublicKey
 }
 
 func NewChargeClient(configData common.BaseConfig, intface interface{}) *ChargeClient {
+
 	var cc = &ChargeClient{
 		ClientInterface: intface.(ClientInterface),
 		HttpClient:      container.HttpClient,
+		PrivateKey:      util.Bytes2RSAPrivateKey([]byte(configData.ConfigAliData.RsaPrivateKey)),
+		PublicKey:       util.Bytes2RSAPublicKey([]byte(configData.ConfigAliData.AliPublicKey)),
+		AliResResult:    &data.AliResResult{},
 	}
 	//将继承的实现掉 配置信息和请求都是在公共的地方，可以考虑先统一实现再初始化配置，考虑先处理配置是可以判断配置有没有问题
 	cc.ChargeClient = common.NewChargeClient(configData, intface.(common.ChargeClientInterface))
@@ -53,65 +64,39 @@ func (pc *ChargeClient) Charge(data common.ReqData) interface{} {
 
 //检测配置
 func (pc *ChargeClient) CheckConfig() {
-	if pc.ConfigData.ConfigWxData.Md5Key == "" {
+	if pc.ConfigData.ConfigAliData.RsaPrivateKey == nil {
 		errors.ThrewError(errors.PAY_CONFIG_NO_KEY)
 	}
 }
 
 // GetSign 产生签名
 func (pc *ChargeClient) GetSign(m map[string]string) (string, error) {
+	delete(m, "sign_type")
 	delete(m, "sign")
-	var signData = make([]string, 0)
+	var data []string
 	for k, v := range m {
-		if v != "" {
-			signData = append(signData, fmt.Sprintf("%s=%s", k, v))
+		if v == "" {
+			continue
 		}
+		data = append(data, fmt.Sprintf("%s=%s", k, v))
 	}
-	sort.Strings(signData)
-	signStr := strings.Join(signData, "&")
-	signStr = signStr + "&key=" + pc.ConfigData.ConfigWxData.Md5Key
-	fmt.Println(signStr)
-	c := md5.New()
-	_, err := c.Write([]byte(signStr))
+	sort.Strings(data)
+	signData := strings.Join(data, "&")
+	s := sha1.New()
+	_, err := s.Write([]byte(signData))
+	if err != nil {
+		log.Println(err)
+	}
+	hashByte := s.Sum(nil)
+
+	signByte, err := pc.PrivateKey.Sign(rand.Reader, hashByte, crypto.SHA1)
 	if err != nil {
 		return "", err
 	}
-	signByte := c.Sum(nil)
-	if err != nil {
-		return "", err
-	}
-	return strings.ToUpper(fmt.Sprintf("%x", signByte)), nil
+	return url.QueryEscape(base64.StdEncoding.EncodeToString(signByte)), nil
 }
 
 func (pc *ChargeClient) Send() interface{} {
-	xmlstring := pc.BuildData() //这么调用是因为本身没实现，必定走的是子集的方法,但是还是推荐加ClientInterface
-	info, err := pc.HttpClient.PostBodyXml("https://api.mch.weixin.qq.com/pay/unifiedorder", xmlstring)
-	err = xml.Unmarshal(info, &pc.WeChatReResult)
-	if err != nil {
-		errors.ThrewMessageError(err.Error())
-	}
-	if pc.WeChatReResult.ReturnCode != "SUCCESS" || pc.WeChatReResult.ResultCode != "SUCCESS" {
-		errors.ThrewMessageError(pc.WeChatReResult.ErrCodeDes)
-	}
+	pc.ClientInterface.BuildData() //这么调用是因为本身没实现，必定走的是子集的方法,但是还是推荐加ClientInterface
 	return pc.ClientInterface.BuildResData()
-}
-
-func (pc *ChargeClient) BuildResData() interface{} {
-	var resPar = data.ResCharge{
-		AppID:     pc.WeChatReResult.AppID,
-		TimeStamp: strconv.FormatInt(time.Now().Unix(), 10),
-		NonceStr:  pc.WeChatReResult.NonceStr,
-		Package:   "prepay_id=" + pc.WeChatReResult.PrepayID,
-		SignType:  "MD5",
-		Sign:      "",
-	}
-	var allParams = map[string]string{
-		"appId":     resPar.AppID,
-		"timeStamp": resPar.TimeStamp,
-		"nonceStr":  resPar.NonceStr,
-		"package":   resPar.Package,
-		"signType":  resPar.SignType,
-	}
-	resPar.Sign, _ = pc.GetSign(allParams)
-	return resPar
 }
