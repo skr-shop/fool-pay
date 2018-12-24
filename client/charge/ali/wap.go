@@ -3,6 +3,7 @@ package ali
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -33,7 +34,7 @@ func (wpc *AliWapCharge) BuildData() string {
 		ReturnUrl:  wccc.ReturnUrl,
 		Charset:    "UTF-8",
 		SignType:   wpc.GetSignType(),
-		Timestamp:  time.Now().Format("2006-01-02 15-04-05"),
+		Timestamp:  time.Now().Format("2006-01-02 15:04:05"),
 		Version:    "1.0",
 		NotifyUrl:  wccc.NotifyUrl,
 		BizContent: wpc.GetBizContent(),
@@ -52,7 +53,10 @@ func (wpc *AliWapCharge) BuildData() string {
 func (wpc *AliWapCharge) ToURL(m map[string]string) string {
 	var buf []string
 	for k, v := range m {
-		buf = append(buf, fmt.Sprintf("%s=%s", k, v))
+		if v == "" {
+			continue
+		}
+		buf = append(buf, fmt.Sprintf("%s=%s", k, url.QueryEscape(v)))
 	}
 	return fmt.Sprintf("%s?%s", "https://mapi.alipay.com/gateway.do", strings.Join(buf, "&"))
 }
@@ -82,4 +86,8 @@ func (wpc *AliWapCharge) GetBizContent() string {
 		//出错了
 	}
 	return string(b)
+}
+
+func (wpc *AliWapCharge) GetSignType() string {
+	return "RSA"
 }

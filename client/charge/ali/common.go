@@ -7,6 +7,7 @@ import (
 
 type ClientInterface interface {
 	BuildData() string
+	GetSignType() string
 }
 
 type ChargeClient struct {
@@ -20,8 +21,4 @@ func NewChargeClient(configData common.BaseConfig, intface interface{}) *ChargeC
 	}
 	tmp.ChargeClient = alibase.NewChargeClient(configData, intface)
 	return tmp
-}
-
-func (pc *ChargeClient) GetSignType() string {
-	return "RSA"
 }

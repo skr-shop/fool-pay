@@ -5,10 +5,10 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 	"log"
-	"net/url"
 	"sort"
 	"strings"
 
@@ -71,7 +71,6 @@ func (pc *ChargeClient) CheckConfig() {
 
 // GetSign 产生签名
 func (pc *ChargeClient) GetSign(m map[string]string) (string, error) {
-	delete(m, "sign_type")
 	delete(m, "sign")
 	var data []string
 	for k, v := range m {
@@ -82,18 +81,63 @@ func (pc *ChargeClient) GetSign(m map[string]string) (string, error) {
 	}
 	sort.Strings(data)
 	signData := strings.Join(data, "&")
+	sign := ""
+	switch pc.ClientInterface.GetSignType() {
+	case "RSA":
+		sign = pc.RsaSign(signData)
+	case "RSA2":
+		sign = pc.Rsa2Sign(signData)
+	}
+	return sign, nil
+}
+
+func (pc *ChargeClient) RsaSign(signData string) string {
 	s := sha1.New()
 	_, err := s.Write([]byte(signData))
 	if err != nil {
 		log.Println(err)
 	}
 	hashByte := s.Sum(nil)
-
 	signByte, err := pc.PrivateKey.Sign(rand.Reader, hashByte, crypto.SHA1)
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return url.QueryEscape(base64.StdEncoding.EncodeToString(signByte)), nil
+	return base64.StdEncoding.EncodeToString(signByte)
+}
+
+func (pc *ChargeClient) Rsa2Sign(signData string) string {
+	s := sha256.New()
+	_, err := s.Write([]byte(signData))
+	if err != nil {
+		log.Println(err)
+	}
+	hashByte := s.Sum(nil)
+	signByte, err := pc.PrivateKey.Sign(rand.Reader, hashByte, crypto.SHA256)
+	if err != nil {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(signByte)
+}
+
+// CheckSign 检测签名
+func (pc *ChargeClient) CheckSign(data string, sign string) error {
+	signByte, err := base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return err
+	}
+	s := sha1.New()
+	var whichHash crypto.Hash = crypto.SHA1
+	switch pc.ClientInterface.GetSignType() {
+	case "RSA2":
+		s = sha256.New()
+		whichHash = crypto.SHA256
+	}
+	_, err = s.Write([]byte(data))
+	if err != nil {
+		return err
+	}
+	hash := s.Sum(nil)
+	return rsa.VerifyPKCS1v15(pc.PublicKey, whichHash, hash[:], signByte)
 }
 
 func (pc *ChargeClient) Send() interface{} {

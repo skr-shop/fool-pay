@@ -47,12 +47,11 @@ func Bytes2RSAPrivateKey(priKey []byte) *rsa.PrivateKey {
 	if block == nil {
 		fmt.Println("Sign private key decode error")
 	}
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	// privateKey, err := x509.ParsePKCS1PrivateKey(priKey)
+	privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		fmt.Println(err)
 	}
-	return privateKey
+	return privateKey.(*rsa.PrivateKey)
 }
 
 // 阿里官网的测试

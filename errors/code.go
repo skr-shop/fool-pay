@@ -11,6 +11,7 @@ const (
 	NO_SUPPORT_CHANNEL
 	SIGN_WRONG
 	PAY_CONFIG_NO_KEY
+	PAY_DATA_TRS_ERROR
 )
 
 var ErrorMessage = map[ErrorCode]string{
@@ -19,6 +20,7 @@ var ErrorMessage = map[ErrorCode]string{
 	NO_SUPPORT_CHANNEL: "不支持的支付类型",
 	SIGN_WRONG:         "签名错误",
 	PAY_CONFIG_NO_KEY:  "缺少加密的key",
+	PAY_DATA_TRS_ERROR: "数据转失败",
 }
 
 type PayError struct {

@@ -1,104 +1,93 @@
 package ali
 
 import (
-	"crypto"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/sha1"
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
-	"sort"
 	"strings"
+	"time"
 
-	"github.com/lxp521125/fool-pay/common"
+	"github.com/openpeng/fool-pay/errors"
+
+	"github.com/openpeng/fool-pay/constant"
+
+	"github.com/openpeng/fool-pay/common"
+	"github.com/openpeng/fool-pay/common/ali/data"
 )
 
-var defaultAliAppClient *AliAppClient
-
 type AliAppClient struct {
-	PartnerID  string //合作者ID
-	SellerID   string
-	AppID      string // 应用ID
-	PrivateKey *rsa.PrivateKey
-	PublicKey  *rsa.PublicKey
+	*ChargeClient
 }
 
-func InitAliAppClient(c *AliAppClient) {
-	defaultAliAppClient = c
+func NewAliAppClient(configData common.BaseConfig) *AliAppClient {
+	temp := &AliAppClient{}
+	temp.ChargeClient = NewChargeClient(configData, temp)
+	return temp
 }
 
-// DefaultAliAppClient 得到默认支付宝app客户端
-func DefaultAliAppClient() *AliAppClient {
-	return defaultAliAppClient
-}
-
-func (aa *AliAppClient) Pay(charge *common.Charge) (string, error) {
-	data := make(map[string]string)
-	data["service"] = "mobile.securitypay.pay"
-	data["partner"] = aa.PartnerID
-	data["_input_charset"] = "utf-8"
-	data["notify_url"] = charge.CallbackURL
-
-	data["out_trade_no"] = charge.TradeNum
-	data["subject"] = charge.Describe
-	data["payment_type"] = "1"
-	data["seller_id"] = aa.SellerID
-	data["total_fee"] = fmt.Sprintf("%.2f", float64(charge.MoneyFee)/float64(100))
-	data["body"] = charge.Describe
-
-	sign, err := aa.GenSign(data)
-	if err != nil {
-		return "", err
+func (wpc *AliAppClient) BuildData() string {
+	wccc := wpc.ChargeClient.ChargeClient.ConfigData.ConfigAliData
+	var cpd = data.ChargePub{
+		AppId:      wccc.AppId,
+		Method:     string(constant.APP_PAY_METHOD),
+		Format:     "JSON",
+		ReturnUrl:  wccc.ReturnUrl,
+		Charset:    "UTF-8",
+		SignType:   wpc.GetSignType(),
+		Timestamp:  time.Now().Format("2006-01-02 15:04:05"),
+		Version:    "1.0",
+		NotifyUrl:  wccc.NotifyUrl,
+		BizContent: wpc.GetBizContent(),
 	}
-	data["sign"] = sign
-	data["sign_type"] = "RSA"
 
-	var re []string
-	for k, v := range data {
-		re = append(re, fmt.Sprintf("%s=%s", k, v))
-	}
-	return strings.Join(re, "&"), nil
+	b, _ := json.Marshal(cpd)
+	var allParams = make(map[string]string, 0)
+	json.Unmarshal(b, &allParams)
+	sign, _ := wpc.ChargeClient.GetSign(allParams)
+	allParams["sign"] = sign
+	wpc.AliResResult.PayUrl = wpc.ToURL(allParams)
+	return wpc.AliResResult.PayUrl
 }
 
-// GenSign 产生签名
-func (aa *AliAppClient) GenSign(m map[string]string) (string, error) {
-	delete(m, "sign_type")
-	delete(m, "sign")
-	var data []string
+// ToURL
+func (wpc *AliAppClient) ToURL(m map[string]string) string {
+	var buf []string
 	for k, v := range m {
 		if v == "" {
 			continue
 		}
-		data = append(data, fmt.Sprintf("%s=%s", k, v))
+		buf = append(buf, fmt.Sprintf("%s=%s", k, url.QueryEscape(v)))
 	}
-	sort.Strings(data)
-	signData := strings.Join(data, "&")
-	s := sha1.New()
-	_, err := s.Write([]byte(signData))
-	if err != nil {
-		log.Println(err)
-	}
-	hashByte := s.Sum(nil)
-	signByte, err := aa.PrivateKey.Sign(rand.Reader, hashByte, crypto.SHA1)
-	if err != nil {
-		return "", err
-	}
-	return url.QueryEscape(base64.StdEncoding.EncodeToString(signByte)), nil
+	return fmt.Sprintf("%s", strings.Join(buf, "&"))
 }
 
-// CheckSign 检测签名
-func (aa *AliAppClient) CheckSign(data string, sign string) error {
-	signByte, err := base64.StdEncoding.DecodeString(sign)
-	if err != nil {
-		return err
+func (wpc *AliAppClient) BuildResData() interface{} {
+	return wpc.AliResResult
+}
+
+func (wpc *AliAppClient) GetBizContent() string {
+	wccc := wpc.ChargeClient.ChargeClient.ConfigData.ConfigAliData
+	wcr := wpc.ChargeClient.ReqData
+	d := data.BizContent{
+		Body:               wcr.Body,
+		Subject:            wcr.Subject,
+		OutTradeNo:         wcr.OrderNo,
+		TotalAmount:        wcr.Amount,
+		SellerId:           wccc.Partner,
+		ProductCode:        "QUICK_WAP_PAY",
+		GoodsType:          wcr.GoodsType,
+		PassbackParams:     wcr.ReturnParam,
+		DisablePayChannels: wccc.LimitPay,
+		StoreId:            wcr.StoreId,
 	}
-	s := sha1.New()
-	_, err = s.Write([]byte(data))
+	b, err := json.Marshal(d)
 	if err != nil {
-		return err
+		errors.ThrewError(errors.PAY_DATA_TRS_ERROR)
+		//出错了
 	}
-	hash := s.Sum(nil)
-	return rsa.VerifyPKCS1v15(aa.PublicKey, crypto.SHA1, hash[:], signByte)
+	return string(b)
+}
+
+func (wpc *AliAppClient) GetSignType() string {
+	return "RSA2"
 }
