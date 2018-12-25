@@ -15,17 +15,17 @@ import (
 	"github.com/openpeng/fool-pay/common/ali/data"
 )
 
-type AliAppClient struct {
+type AliAppCharge struct {
 	*ChargeClient
 }
 
-func NewAliAppClient(configData common.BaseConfig) *AliAppClient {
-	temp := &AliAppClient{}
+func NewAliAppCharge(configData common.BaseConfig) *AliAppCharge {
+	temp := &AliAppCharge{}
 	temp.ChargeClient = NewChargeClient(configData, temp)
 	return temp
 }
 
-func (wpc *AliAppClient) BuildData() string {
+func (wpc *AliAppCharge) BuildData() string {
 	wccc := wpc.ChargeClient.ChargeClient.ConfigData.ConfigAliData
 	var cpd = data.ChargePub{
 		AppId:      wccc.AppId,
@@ -50,7 +50,7 @@ func (wpc *AliAppClient) BuildData() string {
 }
 
 // ToURL
-func (wpc *AliAppClient) ToURL(m map[string]string) string {
+func (wpc *AliAppCharge) ToURL(m map[string]string) string {
 	var buf []string
 	for k, v := range m {
 		if v == "" {
@@ -61,11 +61,11 @@ func (wpc *AliAppClient) ToURL(m map[string]string) string {
 	return fmt.Sprintf("%s", strings.Join(buf, "&"))
 }
 
-func (wpc *AliAppClient) BuildResData() interface{} {
+func (wpc *AliAppCharge) BuildResData() interface{} {
 	return wpc.AliResResult
 }
 
-func (wpc *AliAppClient) GetBizContent() string {
+func (wpc *AliAppCharge) GetBizContent() string {
 	wccc := wpc.ChargeClient.ChargeClient.ConfigData.ConfigAliData
 	wcr := wpc.ChargeClient.ReqData
 	d := data.BizContent{
@@ -88,6 +88,6 @@ func (wpc *AliAppClient) GetBizContent() string {
 	return string(b)
 }
 
-func (wpc *AliAppClient) GetSignType() string {
+func (wpc *AliAppCharge) GetSignType() string {
 	return "RSA2"
 }
