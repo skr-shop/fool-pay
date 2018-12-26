@@ -5,13 +5,13 @@ import (
 )
 
 type ReqData struct {
-	Body           string `json:"body" form:"body"  xml:"body"`
-	Subject        string `json:"subject" form:"subject"  xml:"subject"`
-	Openid         string `json:"openid" form:"openid"  xml:"openid"`
-	OrderNo        string `json:"order_no" form:"order_no"  xml:"order_no"`
-	TimeoutExpress int64  `json:"timeout_express" form:"timeout_express"  xml:"timeout_express"`
-	Amount         string `json:"amount" form:"amount"  xml:"amount"`
-	ReturnParam    string `json:"return_param" form:"return_param"  xml:"return_param"`
+	Body           string  `json:"body" form:"body"  xml:"body"`
+	Subject        string  `json:"subject" form:"subject"  xml:"subject"`
+	Openid         string  `json:"openid" form:"openid"  xml:"openid"`
+	OrderNo        string  `json:"order_no" form:"order_no"  xml:"order_no"`
+	TimeoutExpress int64   `json:"timeout_express" form:"timeout_express"  xml:"timeout_express"`
+	Amount         float64 `json:"amount" form:"amount"  xml:"amount"` //单位元两位小数
+	ReturnParam    string  `json:"return_param" form:"return_param"  xml:"return_param"`
 	// 支付宝公有
 	GoodsType int8   `json:"goods_type" form:"goods_type"  xml:"goods_type"`
 	StoreId   string `json:"store_id" form:"store_id"  xml:"store_id"`

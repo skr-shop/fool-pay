@@ -72,7 +72,7 @@ func (wpc *AliWapCharge) GetBizContent() string {
 		Body:               wcr.Body,
 		Subject:            wcr.Subject,
 		OutTradeNo:         wcr.OrderNo,
-		TotalAmount:        wcr.Amount,
+		TotalAmount:        fmt.Sprintf("%.2f", wcr.Amount),
 		SellerId:           wccc.Partner,
 		ProductCode:        "QUICK_WAP_PAY",
 		GoodsType:          wcr.GoodsType,

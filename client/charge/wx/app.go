@@ -39,7 +39,7 @@ func (wpc *WxAppCharge) BuildData() string {
 		OutTradeNo:     wcr.OrderNo,
 		TimeExpire:     time.Unix(wcr.TimeoutExpress, 0).Format("20060102150405"),
 		Openid:         wcr.Openid,
-		TotalFee:       wcr.Amount,
+		TotalFee:       fmt.Sprintf("%.0f", wcr.Amount*100),
 		TradeType:      "APP",
 		SpbillCreateIp: wcr.ClientIp,
 		TimeStart:      time.Now().Format("20060102150405"),
