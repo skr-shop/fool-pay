@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/openpeng/fool-pay/errors"
 	"github.com/openpeng/fool-pay/util"
@@ -45,11 +46,12 @@ func (nc *NotifyClient) GetNotifyData(b []byte) notify.NotifyProcessData {
 	signData, _ := util.XmlToMap(b)
 	xml.Unmarshal(b, &notifyMapData)
 	nc.CheckSign(signData, notifyMapData.Sign)
+	endTime, _ := time.Parse("20060102150405", notifyMapData.TimeEnd)
 	return notify.NotifyProcessData{
-		Amount:      float32(notifyMapData.TotalFee) / 100,
+		Amount:      notifyMapData.TotalFee / 100,
 		Attach:      notifyMapData.Attach,
 		OrderNo:     notifyMapData.OutTradeNO,
-		PayTime:     notifyMapData.TimeEnd,
+		PayTime:     endTime.Unix() - 8*3600, //当前时间要减8小时
 		BuyerId:     notifyMapData.OpenID,
 		OutTradeNo:  notifyMapData.OutTradeNO,
 		TradeStatus: notifyMapData.ReturnMsg,

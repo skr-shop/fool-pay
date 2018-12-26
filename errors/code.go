@@ -6,7 +6,7 @@ type ErrorCode int
 
 const (
 	HANDLE_OK  ErrorCode = 0
-	PAY_MODULE ErrorCode = 10001 + iota
+	PAY_MODULE ErrorCode = 10000 + iota
 	PAY_PUB_WRONG
 	NO_SUPPORT_CHANNEL
 	SIGN_WRONG
