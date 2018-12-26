@@ -50,7 +50,7 @@ func (nc *NotifyClient) GetNotifyData(b []byte) notify.NotifyProcessData {
 	return notify.NotifyProcessData{
 		Amount:      float64(notifyMapData.TotalFee / 100),
 		Attach:      notifyMapData.Attach,
-		OrderNo:     notifyMapData.OutTradeNO,
+		OrderNo:     notifyMapData.TransactionID,
 		PayTime:     endTime.Unix() - 8*3600, //当前时间要减8小时
 		BuyerId:     notifyMapData.OpenID,
 		OutTradeNo:  notifyMapData.OutTradeNO,
