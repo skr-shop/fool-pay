@@ -9,6 +9,7 @@ import (
 
 	"github.com/openpeng/fool-pay/common"
 	"github.com/openpeng/fool-pay/common/wx/data"
+	"github.com/openpeng/fool-pay/util"
 )
 
 type WxPubCharge struct {
@@ -41,7 +42,7 @@ func (wpc *WxPubCharge) BuildData() string {
 		TradeType:      "JSAPI",
 		SpbillCreateIp: wcr.ClientIp,
 		TimeStart:      time.Now().Format("20060102150405"),
-		NonceStr:       "11221315456",
+		NonceStr:       util.RandomStr(),
 	}
 	b, _ := json.Marshal(cpd)
 	var allParams = make(map[string]string, 0)

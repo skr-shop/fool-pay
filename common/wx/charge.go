@@ -91,6 +91,9 @@ func (pc *ChargeClient) Send() interface{} {
 		errors.ThrewMessageError(err.Error())
 	}
 	if pc.WeChatReResult.ReturnCode != "SUCCESS" || pc.WeChatReResult.ResultCode != "SUCCESS" {
+		if pc.WeChatReResult.ReturnMsg != "" {
+			errors.ThrewMessageError(pc.WeChatReResult.ReturnMsg)
+		}
 		errors.ThrewMessageError(pc.WeChatReResult.ErrCodeDes)
 	}
 	return pc.ClientInterface.BuildResData()
