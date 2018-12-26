@@ -48,7 +48,7 @@ func (nc *NotifyClient) GetNotifyData(b []byte) notify.NotifyProcessData {
 	nc.CheckSign(signData, notifyMapData.Sign)
 	endTime, _ := time.Parse("20060102150405", notifyMapData.TimeEnd)
 	return notify.NotifyProcessData{
-		Amount:      notifyMapData.TotalFee / 100,
+		Amount:      float64(notifyMapData.TotalFee / 100),
 		Attach:      notifyMapData.Attach,
 		OrderNo:     notifyMapData.OutTradeNO,
 		PayTime:     endTime.Unix() - 8*3600, //当前时间要减8小时
