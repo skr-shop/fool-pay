@@ -17,7 +17,7 @@ import (
 )
 
 type NotifyClientInterface interface {
-	BuildData() string
+	BuildResData() string
 }
 
 type NotifyClient struct {
@@ -36,7 +36,7 @@ func NewNotifyClient(config common.BaseConfig, intface NotifyClientInterface) *N
 func (nc *NotifyClient) Notify(d []byte, process notify.NotifyInterface) string {
 	ok := process.NotifyProcess(nc.GetNotifyData(d))
 	if ok {
-		return "ok"
+		return nc.NotifyClientInterface.BuildResData()
 	}
 	return "false"
 }
@@ -80,7 +80,6 @@ func (nc *NotifyClient) GetSign(m map[string]string) (string, error) {
 	sort.Strings(signData)
 	signStr := strings.Join(signData, "&")
 	signStr = signStr + "&key=" + nc.ConfigData.ConfigWxData.Md5Key
-	fmt.Println(signStr)
 	c := md5.New()
 	_, err := c.Write([]byte(signStr))
 	if err != nil {

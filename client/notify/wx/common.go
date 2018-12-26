@@ -6,7 +6,7 @@ import (
 )
 
 type ClientInterface interface {
-	BuildData() string
+	BuildResData() string
 }
 
 type NotifyClient struct {

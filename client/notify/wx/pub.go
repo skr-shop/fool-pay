@@ -14,7 +14,7 @@ func NewWechatNotify(config common.BaseConfig) *WechatNotify {
 	return temp
 }
 
-func (wn *WechatNotify) BuildResData() interface{} {
+func (wn *WechatNotify) BuildResData() string {
 	return "ok"
 }
 
