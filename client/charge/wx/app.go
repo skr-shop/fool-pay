@@ -60,7 +60,7 @@ func (wpc *WxAppCharge) BuildData() string {
 	return xmlStr
 }
 
-func (pc *ChargeClient) BuildResData() interface{} {
+func (pc *WxAppCharge) BuildResData() interface{} {
 	var resPar = data.ResAppCharge{
 		AppID:     pc.WeChatReResult.AppID,
 		Partnerid: pc.ConfigData.ConfigWxData.MchId,

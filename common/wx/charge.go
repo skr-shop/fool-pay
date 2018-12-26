@@ -5,9 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/openpeng/fool-pay/container"
 
@@ -97,24 +95,4 @@ func (pc *ChargeClient) Send() interface{} {
 		errors.ThrewMessageError(pc.WeChatReResult.ErrCodeDes)
 	}
 	return pc.ClientInterface.BuildResData()
-}
-
-func (pc *ChargeClient) BuildResData() interface{} {
-	var resPar = data.ResCharge{
-		AppID:     pc.WeChatReResult.AppID,
-		TimeStamp: strconv.FormatInt(time.Now().Unix(), 10),
-		NonceStr:  pc.WeChatReResult.NonceStr,
-		Package:   "prepay_id=" + pc.WeChatReResult.PrepayID,
-		SignType:  "MD5",
-		Sign:      "",
-	}
-	var allParams = map[string]string{
-		"appId":     resPar.AppID,
-		"timeStamp": resPar.TimeStamp,
-		"nonceStr":  resPar.NonceStr,
-		"package":   resPar.Package,
-		"signType":  resPar.SignType,
-	}
-	resPar.Sign, _ = pc.GetSign(allParams)
-	return resPar
 }
