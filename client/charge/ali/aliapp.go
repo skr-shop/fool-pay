@@ -77,7 +77,7 @@ func (wpc *AliAppCharge) GetBizContent() string {
 		ProductCode:        "QUICK_WAP_PAY",
 		GoodsType:          wcr.GoodsType,
 		PassbackParams:     wcr.ReturnParam,
-		DisablePayChannels: wccc.LimitPay,
+		DisablePayChannels: strings.Join(wccc.LimitPay, ","),
 		StoreId:            wcr.StoreId,
 	}
 	b, err := json.Marshal(d)

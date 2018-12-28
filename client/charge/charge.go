@@ -15,6 +15,7 @@ var supportChannel = []constant.PayChannel{
 	constant.WX_CHANNEL_QR,
 	constant.ALI_CHANNEL_WAP,
 	constant.ALI_CHANNEL_APP,
+	constant.ALI_CHANNEL_OLD_QUICK,
 }
 
 func Run(channel constant.PayChannel, config common.BaseConfig, data common.ReqData) (retdata interface{}, iswrong errors.PayError) {
@@ -52,6 +53,10 @@ func getHandle(channel constant.PayChannel, config common.BaseConfig) common.Cha
 	case constant.ALI_CHANNEL_APP:
 		handle = aliCharge.NewAliAppCharge(config)
 		break
+	case constant.ALI_CHANNEL_OLD_QUICK:
+		handle = aliCharge.NewAliOldCharge(config)
+		break
+
 	// case Config::WX_CHANNEL_WAP:
 	//     $this->channel = new WxWapCharge($config);
 	//     break;

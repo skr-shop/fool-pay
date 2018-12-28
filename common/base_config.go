@@ -28,8 +28,8 @@ type ConfigAliData struct {
 	// 可以填写文件路径，或者密钥字符串  当前字符串是 rsa2 的支付宝公钥
 	AliPublicKey []byte `json:"ali_public_key"`
 	// 可以填写文件路径，或者密钥字符串  我的沙箱模式，rsa与rsa2的私钥相同，为了方便测试
-	RsaPrivateKey []byte `json:"rsa_private_key"`
-	LimitPay      string `json:"limit_pay"` // 指定不能使用信用卡支付   不传入，则均可使用
+	RsaPrivateKey []byte   `json:"rsa_private_key"`
+	LimitPay      []string `json:"limit_pay"` // 指定不能使用信用卡支付   不传入，则均可使用
 	// 		'limit_pay' => [
 	// 			//'balance',// 余额
 	// 			//'moneyFund',// 余额宝

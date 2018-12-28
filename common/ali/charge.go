@@ -2,6 +2,7 @@ package common
 
 import (
 	"crypto"
+	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -42,16 +43,14 @@ type ChargeClient struct {
 }
 
 func NewChargeClient(configData common.BaseConfig, intface interface{}) *ChargeClient {
-
 	var cc = &ChargeClient{
 		ClientInterface: intface.(ClientInterface),
 		HttpClient:      container.HttpClient,
-		PrivateKey:      util.Bytes2RSAPrivateKey([]byte(configData.ConfigAliData.RsaPrivateKey)),
-		PublicKey:       util.Bytes2RSAPublicKey([]byte(configData.ConfigAliData.AliPublicKey)),
 		AliResResult:    &data.AliResResult{},
 	}
 	//将继承的实现掉 配置信息和请求都是在公共的地方，可以考虑先统一实现再初始化配置，考虑先处理配置是可以判断配置有没有问题
 	cc.ChargeClient = common.NewChargeClient(configData, intface.(common.ChargeClientInterface))
+
 	return cc
 }
 
@@ -64,14 +63,24 @@ func (pc *ChargeClient) Charge(data common.ReqData) interface{} {
 
 //检测配置
 func (pc *ChargeClient) CheckConfig() {
-	if pc.ConfigData.ConfigAliData.RsaPrivateKey == nil {
-		errors.ThrewError(errors.PAY_CONFIG_NO_KEY)
+	if pc.ClientInterface.GetSignType() != "MD5" {
+		pc.PrivateKey = util.Bytes2RSAPrivateKey([]byte(pc.ConfigData.ConfigAliData.RsaPrivateKey))
+		pc.PublicKey = util.Bytes2RSAPublicKey([]byte(pc.ConfigData.ConfigAliData.AliPublicKey))
+		if pc.ConfigData.ConfigAliData.RsaPrivateKey == nil {
+			errors.ThrewError(errors.PAY_CONFIG_NO_KEY)
+		}
+	} else {
+		if pc.ConfigData.ConfigAliData.Key == "" {
+			errors.ThrewError(errors.PAY_CONFIG_NO_KEY)
+		}
 	}
+
 }
 
 // GetSign 产生签名
 func (pc *ChargeClient) GetSign(m map[string]string) (string, error) {
 	delete(m, "sign")
+	delete(m, "sign_type")
 	var data []string
 	for k, v := range m {
 		if v == "" {
@@ -83,12 +92,29 @@ func (pc *ChargeClient) GetSign(m map[string]string) (string, error) {
 	signData := strings.Join(data, "&")
 	sign := ""
 	switch pc.ClientInterface.GetSignType() {
+	case "MD5":
+		sign = pc.Md5Sign(signData)
 	case "RSA":
 		sign = pc.RsaSign(signData)
 	case "RSA2":
 		sign = pc.Rsa2Sign(signData)
 	}
 	return sign, nil
+}
+
+func (pc *ChargeClient) Md5Sign(signData string) string {
+	signData = signData + pc.ConfigData.ConfigAliData.Key
+	c := md5.New()
+	_, err := c.Write([]byte(signData))
+	if err != nil {
+		return ""
+	}
+	signByte := c.Sum(nil)
+	if err != nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%x", signByte)
 }
 
 func (pc *ChargeClient) RsaSign(signData string) string {

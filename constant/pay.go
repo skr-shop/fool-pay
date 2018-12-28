@@ -29,6 +29,8 @@ const (
 
 	ALI_CHANNEL_BAR PayChannel = "ali_bar" // 支付宝 条码支付
 
+	ALI_CHANNEL_OLD_QUICK PayChannel = "ali_quick" // 支付宝 老版本快捷MD5加密 支付
+
 	//========================= 微信相关接口 =======================//
 	// 支付常量
 	WX_CHANNEL_APP PayChannel = "wx_app" // 微信 APP 支付
