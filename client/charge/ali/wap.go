@@ -89,5 +89,9 @@ func (wpc *AliWapCharge) GetBizContent() string {
 }
 
 func (wpc *AliWapCharge) GetSignType() string {
+	switch strings.ToUpper(wpc.ConfigData.ConfigAliData.SignType) {
+	case "RSA":
+		return "RSA"
+	}
 	return "RSA"
 }

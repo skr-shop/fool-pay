@@ -27,6 +27,7 @@ type ClientInterface interface {
 	BuildData() string
 	GetSignType() string
 	CheckConfig()
+	IsOldPay() bool
 	BuildResData() interface{}
 }
 
@@ -58,6 +59,7 @@ func NewChargeClient(configData common.BaseConfig, intface interface{}) *ChargeC
 func (pc *ChargeClient) Charge(data common.ReqData) interface{} {
 	pc.ChargeClient.ReqData = data
 	pc.ClientInterface.CheckConfig() //可以调用到子集的方法
+	pc.ClientInterface.BuildData()   //这么调用是因为本身没实现，必定走的是子集的方法,但是还是推荐加ClientInterface
 	return pc.Send()
 }
 
@@ -80,7 +82,9 @@ func (pc *ChargeClient) CheckConfig() {
 // GetSign 产生签名
 func (pc *ChargeClient) GetSign(m map[string]string) (string, error) {
 	delete(m, "sign")
-	delete(m, "sign_type")
+	if pc.ClientInterface.IsOldPay() {
+		delete(m, "sign_type")
+	}
 	var data []string
 	for k, v := range m {
 		if v == "" {
@@ -167,6 +171,9 @@ func (pc *ChargeClient) CheckSign(data string, sign string) error {
 }
 
 func (pc *ChargeClient) Send() interface{} {
-	pc.ClientInterface.BuildData() //这么调用是因为本身没实现，必定走的是子集的方法,但是还是推荐加ClientInterface
 	return pc.ClientInterface.BuildResData()
+}
+
+func (pc *ChargeClient) IsOldPay() bool {
+	return false
 }

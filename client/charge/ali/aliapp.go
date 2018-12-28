@@ -89,5 +89,12 @@ func (wpc *AliAppCharge) GetBizContent() string {
 }
 
 func (wpc *AliAppCharge) GetSignType() string {
-	return "RSA2"
+	switch strings.ToUpper(wpc.ConfigData.ConfigAliData.SignType) {
+	case "RSA2":
+		return "RSA2"
+	case "RSA":
+		return "RSA"
+	}
+	errors.ThrewError(errors.PAY_WAY_NO_SIGN_TYPE)
+	return ""
 }

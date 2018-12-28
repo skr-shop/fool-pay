@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/openpeng/fool-pay/common"
+	"github.com/openpeng/fool-pay/errors"
 )
 
 type AliOldCharge struct {
@@ -29,7 +30,7 @@ func (wpc *AliOldCharge) BuildData() string {
 		"service":           "create_direct_pay_by_user",
 		"partner":           wccc.Partner,
 		"_input_charset":    "utf-8",
-		"sign_type":         "MD5",
+		"sign_type":         wpc.GetSignType(),
 		"sign":              "",
 		"notify_url":        wccc.NotifyUrl,
 		"return_url":        wccc.ReturnUrl,
@@ -68,5 +69,16 @@ func (wpc *AliOldCharge) BuildResData() interface{} {
 }
 
 func (wpc *AliOldCharge) GetSignType() string {
-	return "MD5"
+	switch strings.ToUpper(wpc.ConfigData.ConfigAliData.SignType) {
+	case "MD5":
+		return "MD5"
+	case "RSA":
+		return "RSA"
+	}
+	errors.ThrewError(errors.PAY_WAY_NO_SIGN_TYPE)
+	return ""
+}
+
+func (wpc *AliOldCharge) IsOldPay() bool {
+	return true
 }
