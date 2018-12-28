@@ -95,6 +95,5 @@ func (wpc *AliAppCharge) GetSignType() string {
 	case "RSA":
 		return "RSA"
 	}
-	errors.ThrewError(errors.PAY_WAY_NO_SIGN_TYPE)
-	return ""
+	return "RSA"
 }

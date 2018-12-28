@@ -1,6 +1,6 @@
 package errors
 
-import "fmt"
+import "github.com/openpeng/fool-pay/container"
 
 type ErrorCode int
 
@@ -26,8 +26,8 @@ var ErrorMessage = map[ErrorCode]string{
 }
 
 type PayError struct {
-	ErrorCode ErrorCode
-	Message   string
+	ErrorCode ErrorCode `json:"error_code"`
+	Message   string    `json:"message"`
 }
 
 func ThrewError(errorCode ErrorCode) {
@@ -55,6 +55,6 @@ func Catch(e *PayError) {
 			e.Message = pe.Message
 			return
 		}
-		fmt.Println(err)
+		container.LogHandle.Write(err)
 	}
 }

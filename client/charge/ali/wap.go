@@ -58,7 +58,7 @@ func (wpc *AliWapCharge) ToURL(m map[string]string) string {
 		}
 		buf = append(buf, fmt.Sprintf("%s=%s", k, url.QueryEscape(v)))
 	}
-	return fmt.Sprintf("%s?%s", "https://mapi.alipay.com/gateway.do", strings.Join(buf, "&"))
+	return fmt.Sprintf("%s?%s", "https://openapi.alipay.com/gateway.do", strings.Join(buf, "&"))
 }
 
 func (wpc *AliWapCharge) BuildResData() interface{} {
@@ -92,6 +92,8 @@ func (wpc *AliWapCharge) GetSignType() string {
 	switch strings.ToUpper(wpc.ConfigData.ConfigAliData.SignType) {
 	case "RSA":
 		return "RSA"
+	case "RSA2":
+		return "RSA2"
 	}
 	return "RSA"
 }

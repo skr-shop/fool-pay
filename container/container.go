@@ -7,8 +7,10 @@ import (
 
 var (
 	HttpClient *common.HttpClient
+	LogHandle  *common.LogClient
 )
 
 func init() {
 	HttpClient = common.NewHttpClient(util.InitHttpClient())
+	LogHandle = common.NewLogClient(util.InitLogClient())
 }
