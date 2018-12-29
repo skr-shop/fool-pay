@@ -10,19 +10,19 @@ import (
 	"github.com/openpeng/fool-pay/errors"
 )
 
-type AliOldCharge struct {
+type AliOldWebCharge struct {
 	*ChargeClient
 }
 
-func NewAliOldCharge(configData common.BaseConfig) *AliOldCharge {
-	temp := &AliOldCharge{}
+func NewAliOldWebCharge(configData common.BaseConfig) *AliOldWebCharge {
+	temp := &AliOldWebCharge{}
 	temp.ChargeClient = NewChargeClient(configData, temp)
 	return temp
 }
 
 //参考文档：https://docs.open.alipay.com/62/104743/
 
-func (wpc *AliOldCharge) BuildData() string {
+func (wpc *AliOldWebCharge) BuildData() string {
 	wccc := wpc.ChargeClient.ChargeClient.ConfigData.ConfigAliData
 	wcr := wpc.ChargeClient.ReqData
 
@@ -53,7 +53,7 @@ func (wpc *AliOldCharge) BuildData() string {
 }
 
 // ToURL
-func (wpc *AliOldCharge) ToURL(m map[string]string) string {
+func (wpc *AliOldWebCharge) ToURL(m map[string]string) string {
 	var buf []string
 	for k, v := range m {
 		if v == "" {
@@ -64,11 +64,11 @@ func (wpc *AliOldCharge) ToURL(m map[string]string) string {
 	return fmt.Sprintf("http://mapi.alipay.com/gateway.do?%s", strings.Join(buf, "&"))
 }
 
-func (wpc *AliOldCharge) BuildResData() interface{} {
+func (wpc *AliOldWebCharge) BuildResData() interface{} {
 	return wpc.AliResResult
 }
 
-func (wpc *AliOldCharge) GetSignType() string {
+func (wpc *AliOldWebCharge) GetSignType() string {
 	switch strings.ToUpper(wpc.ConfigData.ConfigAliData.SignType) {
 	case "MD5":
 		return "MD5"
@@ -79,6 +79,6 @@ func (wpc *AliOldCharge) GetSignType() string {
 	return ""
 }
 
-func (wpc *AliOldCharge) IsOldPay() bool {
+func (wpc *AliOldWebCharge) IsOldPay() bool {
 	return true
 }
