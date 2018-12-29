@@ -1,6 +1,7 @@
 package notify
 
 import (
+	alinotify "github.com/openpeng/fool-pay/client/notify/ali"
 	wxnotify "github.com/openpeng/fool-pay/client/notify/wx"
 	"github.com/openpeng/fool-pay/common"
 	"github.com/openpeng/fool-pay/constant"
@@ -10,7 +11,7 @@ import (
 
 var supportChannel = []constant.PayOperation{
 	constant.WX_CHARGE,
-	// constant.ALI_CHARGE
+	constant.ALI_CHARGE,
 }
 
 func Run(channel constant.PayOperation, config common.BaseConfig, data []byte, userNotify notify.NotifyInterface) (retdata string, iswrong errors.PayError) {
@@ -36,6 +37,9 @@ func getHandle(channel constant.PayOperation, config common.BaseConfig) common.N
 	switch channel {
 	case constant.WX_CHARGE:
 		handle = wxnotify.NewWechatNotify(config)
+		break
+	case constant.ALI_CHARGE:
+		handle = alinotify.NewAliNotify(config)
 		break
 	default:
 		errors.ThrewError(errors.NO_SUPPORT_CHANNEL)

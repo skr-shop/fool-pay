@@ -8,7 +8,7 @@ type NotifyProcessData struct {
 	BuyerId     string      `json:"buyer_id" xml:"openid"`                              //买家账号
 	OrderNo     string      `json:"order_no" xml:"transaction_id"`                      //三方交易凭证号
 	OutTradeNo  string      `json:"out_trade_no" xml:"out_trade_no"`                    //原支付请求的商户订单号
-	PayTime     int64       `json:"gmt_payment" xml:"time_end"`                         //支付时间 yyyy-MM-dd HH:mm:ss
+	PayTime     int64       `json:"gmt_payment" xml:"time_end"`                         //支付时间 时间戳
 	Origin      interface{} `json:"origin" xml:"origin"`                                //原始数据
 }
 

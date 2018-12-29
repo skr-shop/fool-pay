@@ -1,4 +1,4 @@
-package client
+package alinotify
 
 import (
 	"crypto"

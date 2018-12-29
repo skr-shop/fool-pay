@@ -1,4 +1,4 @@
-package common
+package ali
 
 // AliWebPayResult 支付宝支付结果回调
 type AliWebPayResult struct {
@@ -27,6 +27,7 @@ type AliWebPayResult struct {
 	UseCoupon        string `json:"use_coupon"`
 	RefundStatus     string `json:"refund_status"`
 	GmtRefund        string `json:"gmt_refund"`
+	GmtCreate        string `json:"gmt_create"`
 }
 
 type AliQueryResult struct {
