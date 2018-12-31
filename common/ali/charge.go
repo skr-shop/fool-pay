@@ -51,7 +51,6 @@ func NewChargeClient(configData common.BaseConfig, intface interface{}) *ChargeC
 	}
 	//将继承的实现掉 配置信息和请求都是在公共的地方，可以考虑先统一实现再初始化配置，考虑先处理配置是可以判断配置有没有问题
 	cc.ChargeClient = common.NewChargeClient(configData, intface.(common.ChargeClientInterface))
-
 	return cc
 }
 
@@ -68,7 +67,7 @@ func (pc *ChargeClient) CheckConfig() {
 	if pc.ClientInterface.GetSignType() != "MD5" {
 		pc.PrivateKey = util.Bytes2RSAPrivateKey([]byte(pc.ConfigData.ConfigAliData.RsaPrivateKey))
 		pc.PublicKey = util.Bytes2RSAPublicKey([]byte(pc.ConfigData.ConfigAliData.AliPublicKey))
-		if pc.ConfigData.ConfigAliData.RsaPrivateKey == nil {
+		if pc.ConfigData.ConfigAliData.RsaPrivateKey == "" {
 			errors.ThrewError(errors.PAY_CONFIG_NO_KEY)
 		}
 	} else {

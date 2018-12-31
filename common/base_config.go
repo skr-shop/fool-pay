@@ -16,7 +16,8 @@ type ConfigWxData struct {
 }
 
 type ConfigAliData struct {
-	UseSandbox string `json:"use_sandbox"` // 是否使用沙盒模式
+	UseSandbox bool `json:"use_sandbox"` // 是否使用沙盒模式
+	OldMd5     bool `json:"old_md5"`     //老版本还保留了MD5的加密方式
 	//安全检验码
 	Key string `json:"key"`
 	//签约支付宝账号
@@ -26,9 +27,9 @@ type ConfigAliData struct {
 	AppId    string `json:"app_id"`
 	SignType string `json:"sign_type"` // RSA  RSA2
 	// 可以填写文件路径，或者密钥字符串  当前字符串是 rsa2 的支付宝公钥
-	AliPublicKey []byte `json:"ali_public_key"`
+	AliPublicKey string `json:"ali_public_key"`
 	// 可以填写文件路径，或者密钥字符串  我的沙箱模式，rsa与rsa2的私钥相同，为了方便测试
-	RsaPrivateKey []byte   `json:"rsa_private_key"`
+	RsaPrivateKey string   `json:"rsa_private_key"`
 	LimitPay      []string `json:"limit_pay"` // 指定不能使用信用卡支付   不传入，则均可使用
 	// 		'limit_pay' => [
 	// 			//'balance',// 余额

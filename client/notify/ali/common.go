@@ -1,14 +1,11 @@
 package alinotify
 
 import (
-	"crypto"
-	"crypto/rsa"
-	"crypto/sha1"
-	"encoding/base64"
 	"strings"
 
 	"github.com/openpeng/fool-pay/common"
 	alibase "github.com/openpeng/fool-pay/common/ali"
+	"github.com/openpeng/fool-pay/errors"
 )
 
 type ClientInterface interface {
@@ -29,26 +26,15 @@ func NewNotifyClient(configData common.BaseConfig, intface interface{}) *NotifyC
 }
 
 func (pc *NotifyClient) GetSignType() string {
-	switch strings.ToUpper("RSA") {
+	switch strings.ToUpper(pc.ConfigData.ConfigAliData.SignType) {
+	case "MD5":
+		return "MD5"
 	case "RSA2":
 		return "RSA2"
 	case "RSA":
 		return "RSA"
+	default:
+		errors.ThrewError(errors.NO_SUPPORT_SIGNTYPE)
 	}
 	return "RSA"
-}
-
-// CheckSign 检测签名
-func (ac *NotifyClient) CheckSign(signData, sign string) error {
-	signByte, err := base64.StdEncoding.DecodeString(sign)
-	if err != nil {
-		return err
-	}
-	s := sha1.New()
-	_, err = s.Write([]byte(signData))
-	if err != nil {
-		return err
-	}
-	hash := s.Sum(nil)
-	return rsa.VerifyPKCS1v15(ac.PublicKey, crypto.SHA1, hash, signByte)
 }

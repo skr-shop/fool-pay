@@ -39,7 +39,11 @@ func getHandle(channel constant.PayOperation, config common.BaseConfig) common.N
 		handle = wxnotify.NewWechatNotify(config)
 		break
 	case constant.ALI_CHARGE:
-		handle = alinotify.NewAliNotify(config)
+		if config.ConfigAliData.OldMd5 {
+			handle = alinotify.NewAliOldNotify(config)
+		} else {
+			handle = alinotify.NewAliNotify(config)
+		}
 		break
 	default:
 		errors.ThrewError(errors.NO_SUPPORT_CHANNEL)

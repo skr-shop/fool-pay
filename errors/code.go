@@ -9,6 +9,7 @@ const (
 	PAY_MODULE ErrorCode = 10000 + iota
 	PAY_PUB_WRONG
 	NO_SUPPORT_CHANNEL
+	NO_SUPPORT_SIGNTYPE
 	SIGN_WRONG
 	PAY_CONFIG_NO_KEY
 	PAY_DATA_TRS_ERROR
@@ -23,6 +24,7 @@ var ErrorMessage = map[ErrorCode]string{
 	PAY_CONFIG_NO_KEY:    "缺少加密的key",
 	PAY_DATA_TRS_ERROR:   "数据转失败",
 	PAY_WAY_NO_SIGN_TYPE: "加密方式和支付类型不匹配",
+	NO_SUPPORT_SIGNTYPE:  "不支持的加密方式",
 }
 
 type PayError struct {

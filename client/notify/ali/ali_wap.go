@@ -18,6 +18,6 @@ func (wn *AliNotify) BuildResData() string {
 	return "success"
 }
 
-func (wpc *AliNotify) BuildData() string {
+func (wn *AliNotify) BuildData() string {
 	return "success"
 }

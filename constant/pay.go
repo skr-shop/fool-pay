@@ -11,8 +11,15 @@ type PayOperation string
 type PayStatus string
 type PayServer string
 type AliPayMethod string
+type SignWay string
 
 const (
+	SIGN_WAY_MD5 SignWay = "MD5" //支付宝老版本。微信全版本
+
+	SIGN_WAY_RSA SignWay = "RSA" // 支付宝新老
+
+	SIGN_WAY_RSA2 SignWay = "RSA2" //支付宝推荐新
+
 	PAY_SERVER_ALI PayServer = "ali"
 
 	PAY_SERVER_WX PayServer = "wx"
