@@ -74,7 +74,7 @@ func (wpc *AliAppCharge) GetBizContent() string {
 		OutTradeNo:         wcr.OrderNo,
 		TotalAmount:        fmt.Sprintf("%.2f", wcr.Amount),
 		SellerId:           wccc.Partner,
-		ProductCode:        "QUICK_WAP_PAY",
+		ProductCode:        "QUICK_MSECURITY_PAY",
 		GoodsType:          wcr.GoodsType,
 		PassbackParams:     wcr.ReturnParam,
 		DisablePayChannels: strings.Join(wccc.LimitPay, ","),
