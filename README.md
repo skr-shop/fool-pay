@@ -1,5 +1,6 @@
-# fool-pay
-A fool person can use payment.
+# 开发中... 
+
+> 请勿使用 thx~
 
 #### 项目规划
 
